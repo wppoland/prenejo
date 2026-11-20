@@ -235,7 +235,7 @@ Prenejo is fully translatable and ships the `prenejo.pot` template. Translations
 == Upgrade Notice ==
 
 = 1.1.6 =
-Fixes slot capacity checks and the pickup date shown west of UTC. Update, nothing else to do.
+Security release. Affects shops using pickup slots: a checkout could book a full or paid slot without the checks. Update, nothing else to do.
 
 = 1.1.5 =
 Security release. Only stores that charge a fee for some pickup slots are exposed. Update, nothing else to do.
