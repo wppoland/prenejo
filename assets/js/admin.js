@@ -75,7 +75,7 @@
 				reindex();
 			} else if ( row ) {
 				// Keep at least one row: clear it instead of deleting.
-				var inputs = row.querySelectorAll( 'input[type="text"]' );
+				var inputs = row.querySelectorAll( 'input[type="text"], input[type="hidden"]' );
 				Array.prototype.forEach.call( inputs, function ( input ) {
 					input.value = '';
 				} );
