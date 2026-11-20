@@ -299,18 +299,22 @@ final class CheckoutFields implements HasHooks
             return;
         }
 
+        // validateFields() ran on woocommerce_checkout_process, before WooCommerce
+        // copied the posted shipping method into the session. A request that
+        // switched to local pickup in the same post skipped it, so nothing here
+        // may assume it ran: every failure refuses the order.
         if (
             ! isset($_POST['_pickup_nonce'])
             || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_pickup_nonce'])), self::NONCE)
         ) {
-            return;
+            throw new \Exception(esc_html__('Your pickup selection could not be verified. Please try again.', 'prenejo'));
         }
 
         $locationId = isset($_POST[self::FIELD_LOCATION]) ? sanitize_text_field(wp_unslash($_POST[self::FIELD_LOCATION])) : '';
         $location   = $this->settings->findLocation($locationId);
 
         if (null === $location) {
-            return;
+            throw new \Exception(esc_html__('Please choose a valid pickup location.', 'prenejo'));
         }
 
         $order->update_meta_data(self::META_LOCATION, $locationId);
@@ -320,6 +324,14 @@ final class CheckoutFields implements HasHooks
 
         $date = isset($_POST[self::FIELD_DATE]) ? sanitize_text_field(wp_unslash($_POST[self::FIELD_DATE])) : '';
         $slot = isset($_POST[self::FIELD_SLOT]) ? sanitize_text_field(wp_unslash($_POST[self::FIELD_SLOT])) : '';
+
+        // Only a slot validateFields() accepted, and so priced (it stores exactly
+        // that choice in the session), is saved, and capacity is checked again.
+        $choice = ['location' => $locationId, 'date' => $date, 'slot' => $slot];
+
+        if (WC()->session->get(self::SESSION_CHOICE) !== $choice || ! $this->calculator->isBookable($locationId, $date, $slot)) {
+            throw new \Exception(esc_html__('That pickup time is no longer available. Please pick another.', 'prenejo'));
+        }
 
         if ($date !== '' && $slot !== '') {
             $order->update_meta_data(self::META_DATE, $date);

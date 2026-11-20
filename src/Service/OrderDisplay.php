@@ -61,12 +61,14 @@ final class OrderDisplay implements HasHooks
             return '';
         }
 
-        $ts = strtotime($date);
-        if (false === $ts) {
+        // Midnight in the shop's timezone. strtotime() reads the date as UTC
+        // midnight, which wp_date() then printed as the previous day west of UTC.
+        $day = \DateTimeImmutable::createFromFormat('!Y-m-d', $date, wp_timezone());
+        if (false === $day) {
             return $date;
         }
 
-        return wp_date((string) get_option('date_format', 'Y-m-d'), $ts);
+        return wp_date((string) get_option('date_format', 'Y-m-d'), $day->getTimestamp());
     }
 
     public function renderAdmin(\WC_Order $order): void

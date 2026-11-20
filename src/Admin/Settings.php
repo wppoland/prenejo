@@ -253,6 +253,7 @@ final class Settings implements HasHooks
         ?>
         <fieldset class="pickup-location-row" data-pickup-row>
             <legend class="screen-reader-text"><?php esc_html_e('Pickup location', 'prenejo'); ?></legend>
+            <input type="hidden" name="locations[<?php echo esc_attr((string) $index); ?>][id]" value="<?php echo esc_attr($loc['id']); ?>" />
             <p class="pickup-location-row__field">
                 <label>
                     <span><?php esc_html_e('Name', 'prenejo'); ?></span>
@@ -401,8 +402,17 @@ final class Settings implements HasHooks
                 continue;
             }
 
-            $id = sanitize_title($name);
+            // Keep a saved location's id: bookings are counted per id, so a new id
+            // on rename (or on the first save of the seed "main") forgot every
+            // slot already booked there and let it be booked again.
+            $id = sanitize_title((string) ($row['id'] ?? ''));
             if ($id === '') {
+                $id = sanitize_title($name);
+            }
+            // sanitize_title() percent-encodes a non-Latin name, and the checkout
+            // reads the posted id through sanitize_text_field(), which strips
+            // those octets, so such an id could never be chosen.
+            if ($id === '' || str_contains($id, '%')) {
                 $id = 'loc';
             }
             // Ensure a stable, unique id even for duplicate names.

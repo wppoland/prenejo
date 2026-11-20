@@ -5,7 +5,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
 Requires Plugins: woocommerce
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -140,6 +140,12 @@ Prenejo is fully translatable and ships the `prenejo.pot` template. Translations
 
 == Changelog ==
 
+= 1.1.6 =
+* Security (low): a checkout that switched to local pickup in the same request as placing the order skipped the slot checks, so a full slot could be booked and a paid slot booked without its fee. The order is now refused unless the slot passed validation.
+* Fixed: renaming a pickup location, or saving the settings for the first time, gave the location a new id, so slots already booked there were no longer counted toward its capacity. Locations now keep their id.
+* Fixed: shops west of UTC showed the pickup date one day early in emails, the order screen and My Account.
+* Fixed: a pickup location named in a non-Latin script (Cyrillic, Greek and others) could never be chosen at checkout, because its id did not survive the checkout form. Such locations now get a plain id when the settings are saved.
+
 = 1.1.5 =
 * Security (low): the pickup slot fee now follows the slot submitted with the order. A shopper could post a paid slot at checkout after the order review had last refreshed on a free one and skip the slot fee.
 
@@ -227,6 +233,9 @@ Prenejo is fully translatable and ships the `prenejo.pot` template. Translations
   booking horizon, order + email display, and a WooCommerce settings screen.
 
 == Upgrade Notice ==
+
+= 1.1.6 =
+Fixes slot capacity checks and the pickup date shown west of UTC. Update, nothing else to do.
 
 = 1.1.5 =
 Security release. Only stores that charge a fee for some pickup slots are exposed. Update, nothing else to do.
