@@ -121,9 +121,9 @@ Yes. This plugin is compatible with WordPress Multisite. Network activate it or 
 
 == Screenshots ==
 
-1. On the storefront.
-2. Settings in the WordPress admin.
-3. On a mobile device.
+1. Pickup location, date and time fields at checkout.
+2. Settings under WooCommerce > Pickup: slot length, capacity, lead time and opening hours.
+3. Pickup details on a phone.
 == External Services ==
 
 Pickup does not connect to any external services. The live time-slot lookup at
